@@ -46,6 +46,7 @@ public class ShiroConfig {
         filterChainDefinitonMap.put("/admin","roles[admin]");
         //权限过滤，拥有edit权限的才能访问
         filterChainDefinitonMap.put("/edit","perms[edit]");
+        filterChainDefinitonMap.put("/add","perms[add]");
         //其他请求只验证是否登录过
         filterChainDefinitonMap.put("/**","user");
         //放入Shiro过滤器

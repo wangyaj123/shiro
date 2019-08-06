@@ -17,14 +17,26 @@
             </collection>
         </collection>
     </resultMap>
-    
-    <select id="findByUsername" parameterType="string" resultMap="userMap">
-      SELECT u.*, r.*, p.*
-      FROM user u
-        INNER JOIN user_role ur on ur.uid = u.uid
-        INNER JOIN role r on r.rid = ur.rid
-        INNER JOIN permission_role pr on pr.rid = r.rid
-        INNER JOIN permission p on pr.pid = p.pid
-      WHERE u.username = #{username}
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        uid, username, passworld, rid, rname, pid, name, url
+    </sql>
+    <!--尽量用where语句-->
+    <!--    <select id="findByUsername" parameterType="string" resultMap="userMap">-->
+    <!--      SELECT u.*, r.*, p.*-->
+    <!--      FROM user u-->
+    <!--        INNER JOIN user_role ur on ur.uid = u.uid-->
+    <!--        INNER JOIN role r on r.rid = ur.rid-->
+    <!--        INNER JOIN permission_role pr on pr.rid = r.rid-->
+    <!--        INNER JOIN permission p on pr.pid = p.pid-->
+    <!--      WHERE u.username = #{username}-->
+    <!--    </select>-->
+    <select id="findByUsername" resultMap="userMap" parameterType="string">
+        SELECT temp.*,p.pid, p.name, p.url
+        FROM role r, permission p, permission_role pr,
+            (SELECT u.uid, u.username, u.password,r.rid, r.rname
+            FROM USER u, role r, user_role ur
+            WHERE u.uid = ur.uid AND r.rid = ur.rid AND r.rid AND u.username = #{username}) temp
+        WHERE r.rid = pr.rid AND p.pid = pr.pid AND r.rid = temp.rid
     </select>
 </mapper>

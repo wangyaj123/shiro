@@ -49,7 +49,11 @@ public class UserController {
     public String edit(){
         return "edit success";
     }
-
+    @RequestMapping("/add")
+    @ResponseBody
+    public String add(){
+        return "add success";
+    }
     @RequestMapping("/loginUser")
     public String loginUser( @RequestParam("username")String username,
                             @RequestParam("password") String password,
