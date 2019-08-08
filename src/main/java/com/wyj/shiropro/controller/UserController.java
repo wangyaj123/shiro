@@ -1,65 +1,60 @@
 package com.wyj.shiropro.controller;
 
+import com.wyj.shiropro.common.ActionResponse;
+import com.wyj.shiropro.common.RespBasicCode;
 import com.wyj.shiropro.model.User;
+import com.wyj.shiropro.pojo.request.UserRequest;
+import com.wyj.shiropro.util.LogUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.slf4j.Logger;
+import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
-
-@Controller
+/**
+ * @author wangyajing
+ * @date
+ */
+@RestController
+@RequestMapping("/api/user")
 public class UserController {
-    @RequestMapping("/login")
-    public String login(){
-        return "login";
-    }
-
-    @RequestMapping("/index")
-    public String index(){
-        return "index";
-    }
+    Logger log = LogUtils.get(UserController.class);
 
     @RequestMapping("/logout")
-    public String logout(){
+    public ActionResponse logout(){
         Subject subject = SecurityUtils.getSubject();
         //用户不为空，则手动登出
         if(subject !=null){
             subject.logout();
         }
-        return "login";
+        return ActionResponse.success();
     }
 
     @RequestMapping("/admin")
-    @ResponseBody
-    public String admin(){
-        return "admin success";
+
+    public ActionResponse admin(){
+        return ActionResponse.success();
     }
 
-    @RequestMapping("/unauthorized")
-    public String unauthorized(){
-        return "unauthorized";
-    }
 
     @RequestMapping("/edit")
-    @ResponseBody
-    public String edit(){
-        return "edit success";
+
+    public ActionResponse edit(){
+        return ActionResponse.success();
     }
+    @RequestMapping("/unauthorized")
+    public ActionResponse auth(){
+        return ActionResponse.failed(RespBasicCode.ACCOUNT_NOT_LOGIN);
+    }
+
     @RequestMapping("/add")
-    @ResponseBody
-    public String add(){
-        return "add success";
+    public ActionResponse add(){
+        return ActionResponse.success();
     }
-    @RequestMapping("/loginUser")
-    public String loginUser( @RequestParam("username")String username,
-                            @RequestParam("password") String password,
-                            HttpSession session){
-        System.out.println("username:"+username+",password:"+password);
-        UsernamePasswordToken token = new UsernamePasswordToken(username,password);
+
+    @RequestMapping(value = "/loginUser", method = RequestMethod.POST)
+    public ActionResponse loginUser(@RequestBody UserRequest userRequest){
+        UsernamePasswordToken token = new UsernamePasswordToken(userRequest.getUsername(),userRequest.getPassword());
         //主体
         Subject subject = SecurityUtils.getSubject();
         //认证逻辑可能出现异常
@@ -68,10 +63,11 @@ public class UserController {
             subject.login(token);
             //获取登录用户
             User user = (User) subject.getPrincipal();
-            session.setAttribute("user", user);
-            return "index";
+            log.info("=====登录成功，{}",userRequest.toString());
+            return ActionResponse.success();
         }catch (Exception e){
-            return "login";
+            log.warn("=====登录成功，{}",userRequest.toString());
+            return ActionResponse.failed(RespBasicCode.BUSINESS_EXCEPTION);
         }
     }
 

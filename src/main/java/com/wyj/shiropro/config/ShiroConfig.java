@@ -12,6 +12,9 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.LinkedHashMap;
 
+/**
+ * @author wangyajing
+ */
 @Configuration
 public class ShiroConfig {
     /**
@@ -28,27 +31,27 @@ public class ShiroConfig {
         ShiroFilterFactoryBean bean = new ShiroFilterFactoryBean();
         bean.setSecurityManager(manager);
         //登录页面
-        bean.setLoginUrl("/login");
+//        bean.setLoginUrl("/login");
         //登录成功跳转页面
-        bean.setSuccessUrl("/index");
+//        bean.setSuccessUrl("/index");
         //无权限跳转页面
-        bean.setUnauthorizedUrl("/unauthorized");
+//        bean.setUnauthorizedUrl("/unauthorized");
         //请求-拦截器（权限配置）键值对
         LinkedHashMap<String,String> filterChainDefinitonMap = new LinkedHashMap<>();
 
         //首页地址index，使用authc过滤器进行处理
-        filterChainDefinitonMap.put("/index","authc");
+//        filterChainDefinitonMap.put("/index","authc");
         //登录页面不需要过滤操作
-        filterChainDefinitonMap.put("/login","anon");
+//        filterChainDefinitonMap.put("/login","anon");
         //不做身份验证
-        filterChainDefinitonMap.put("/loginUser","anon");
-        //只有角色为admin的才能访问/admin
-        filterChainDefinitonMap.put("/admin","roles[admin]");
-        //权限过滤，拥有edit权限的才能访问
-        filterChainDefinitonMap.put("/edit","perms[edit]");
-        filterChainDefinitonMap.put("/add","perms[add]");
-        //其他请求只验证是否登录过
-        filterChainDefinitonMap.put("/**","user");
+//        filterChainDefinitonMap.put("/loginUser","anon");
+//        //只有角色为admin的才能访问/admin
+//        filterChainDefinitonMap.put("/admin","roles[admin]");
+//        //权限过滤，拥有edit权限的才能访问
+//        filterChainDefinitonMap.put("/edit","perms[edit]");
+//        filterChainDefinitonMap.put("/add","perms[add]");
+//        //其他请求只验证是否登录过
+//        filterChainDefinitonMap.put("/**","user");
         //放入Shiro过滤器
         bean.setFilterChainDefinitionMap(filterChainDefinitonMap);
         return bean;
