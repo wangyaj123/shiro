@@ -5,7 +5,7 @@
 </head>
 <body>
 <h1> 欢迎登录 </h1>
-<form action="/loginUser" method="post">
+<form action="/api/user/loginUser" method="post">
     <input type="text" name="username"> <br>
     <input type="password" name="password"> <br>
     <input type="submit" value="提交">

@@ -10,7 +10,8 @@ public enum RespBasicCode {
     BUSINESS_EXCEPTION("415","业务异常"),
 
     //权限验证返回状态
-    ACCOUNT_NOT_LOGIN("420","未登录");
+    ACCOUNT_NOT_LOGIN("420","未登录"),
+    ACCOUNT_NOT_AUTH("421","未授权");
 
     /**
      * 返回的状态码

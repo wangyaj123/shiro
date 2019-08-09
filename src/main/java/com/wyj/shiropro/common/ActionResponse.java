@@ -10,6 +10,7 @@ import java.util.*;
  */
 public class ActionResponse<T> {
 /**
+ * 期望json格式
  * {
  * 	"head": {
  * 		"code": "200",

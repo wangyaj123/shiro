@@ -11,6 +11,8 @@ import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.Serializable;
+
 /**
  * @author wangyajing
  * @date
@@ -20,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     Logger log = LogUtils.get(UserController.class);
 
-    @RequestMapping("/logout")
+    @RequestMapping(value = "/logout", method = RequestMethod.POST)
     public ActionResponse logout(){
         Subject subject = SecurityUtils.getSubject();
         //用户不为空，则手动登出
@@ -30,7 +32,7 @@ public class UserController {
         return ActionResponse.success();
     }
 
-    @RequestMapping("/admin")
+    @RequestMapping(value = "/admin", method = RequestMethod.POST)
 
     public ActionResponse admin(){
         return ActionResponse.success();
@@ -42,12 +44,12 @@ public class UserController {
     public ActionResponse edit(){
         return ActionResponse.success();
     }
-    @RequestMapping("/unauthorized")
+    @RequestMapping(value = "/unauthorized", method = RequestMethod.POST)
     public ActionResponse auth(){
-        return ActionResponse.failed(RespBasicCode.ACCOUNT_NOT_LOGIN);
+        return ActionResponse.failed(RespBasicCode.ACCOUNT_NOT_AUTH);
     }
 
-    @RequestMapping("/add")
+    @RequestMapping(value = "/add", method = RequestMethod.POST)
     public ActionResponse add(){
         return ActionResponse.success();
     }
@@ -63,7 +65,11 @@ public class UserController {
             subject.login(token);
             //获取登录用户
             User user = (User) subject.getPrincipal();
-            log.info("=====登录成功，{}",userRequest.toString());
+            //设置session的时间
+            SecurityUtils.getSubject().getSession().setTimeout(5*60*1000);
+            //token信息
+            Serializable tokenId = subject.getSession().getId();
+            log.info("====={}登录成功\n,tokenId={},token={}",userRequest.toString(),tokenId,token);
             return ActionResponse.success();
         }catch (Exception e){
             log.warn("=====登录成功，{}",userRequest.toString());
