@@ -21,4 +21,14 @@ public class UserServiceImpl implements UserService{
     public User findByUsername(String username) {
         return userMapper.findByUsername(username);
     }
+
+    @Override
+    public User login(String username, String password) {
+        return userMapper.login(username, password);
+    }
+
+    @Override
+    public User getUserById(int id) {
+        return userMapper.getUserById(id);
+    }
 }

@@ -1,17 +1,20 @@
 package com.wyj.shiropro.config;
 
-import com.wyj.shiropro.model.Permission;
-import com.wyj.shiropro.model.Role;
-import com.wyj.shiropro.model.User;
+import com.wyj.shiropro.model.*;
+import com.wyj.shiropro.service.TokenServiceImpl;
 import com.wyj.shiropro.service.UserService;
-import org.apache.shiro.authc.*;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -19,13 +22,25 @@ import java.util.Set;
 public class AuthRealm extends AuthorizingRealm {
     @Autowired
     private UserService userService;
+    @Resource
+    private TokenServiceImpl tokenService;
 
-    //授权；取出Session中的User对象
+    @Override
+    public boolean supports(AuthenticationToken token) {
+
+        return token instanceof ShiroToken;
+
+    }
+
+    /**
+     * 授权(权限验证)；取出Session中的User对象
+     * @param principalCollection
+     * @return
+     */
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
-       //session中获取用户
-        User user = (User) principalCollection.fromRealm(this.getClass().getName()).iterator().next();
-        String username = user.getUsername();
+        //session中获取用户
+        User user = (User) principalCollection.getPrimaryPrincipal();
         //权限集合
         List<String> permissionList = new ArrayList<>();
         //角色集合
@@ -49,19 +64,22 @@ public class AuthRealm extends AuthorizingRealm {
     }
 
     /**
-     * 认证登录（认证登录成功后把user放入session中）
+     * 认证登录
      * @param authenticationToken
      * @return
      * @throws AuthenticationException
      */
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
-        UsernamePasswordToken usernamePasswordToken = (UsernamePasswordToken) authenticationToken;
-        //从转换后的token中获取用户名的信息
-        String username = usernamePasswordToken.getUsername();
+        String token = (String) authenticationToken.getCredentials();
+        //从redis中获取token
+        TokenEntiy tokenEntiy = tokenService.getToken(token);
         //DB获取用户的密码
-        User user = userService.findByUsername(username);
-        SimpleAuthenticationInfo simpleAuthenticationInfo = new SimpleAuthenticationInfo(user, user.getPassword(), this.getClass().getName());
+        User user = userService.getUserById(tokenEntiy.getUserId());
+        if(user == null){
+            throw new AuthenticationException("用户不存在");
+        }
+        SimpleAuthenticationInfo simpleAuthenticationInfo = new SimpleAuthenticationInfo(user, token, this.getClass().getName());
         return simpleAuthenticationInfo;
     }
 }

@@ -39,4 +39,20 @@
             WHERE u.uid = ur.uid AND r.rid = ur.rid AND r.rid AND u.username = #{username}) temp
         WHERE r.rid = pr.rid AND p.pid = pr.pid AND r.rid = temp.rid
     </select>
+    <select id="login" parameterType="java.lang.String" resultMap="userMap">
+        select * from user
+        <where>
+            <if test="username != null">
+                username = #{username}
+            </if>
+            and
+            <if test="password != null">
+                password = #{password}
+            </if>
+        </where>
+    </select>
+    <select id="getUserById" parameterType="Integer" resultMap="userMap">
+        select *from user
+        where id = #{id}
+    </select>
 </mapper>

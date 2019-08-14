@@ -7,6 +7,7 @@ package com.wyj.shiropro.common;
 public enum RespBasicCode {
     SUCCESS("200","成功"),
     ERROR("500","异常错误"),
+    LOGIN_FAIL("403","用户名或密码错误"),
     BUSINESS_EXCEPTION("415","业务异常"),
 
     //权限验证返回状态
